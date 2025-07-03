@@ -2,6 +2,7 @@ import {promises as fs} from 'fs';
 import path from 'path';
 import {homedir} from 'os';
 import {Task} from '../types.js';
+import {sampleTasks} from './sample_task.js';
 
 const DATA_DIR = path.join(homedir(), '.taskmaster');
 const TASKS_FILE = path.join(DATA_DIR, 'tasks.json');
@@ -34,7 +35,9 @@ export async function loadTasks(): Promise<Task[]> {
 		}));
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-			return [];
+			// If tasks.json doesn't exist, use sample tasks and save them
+			await saveTasks(sampleTasks);
+			return sampleTasks;
 		}
 
 		throw error;
